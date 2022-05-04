@@ -68,7 +68,8 @@ class Player():
         self,
         symbol: str,
         raisedHand: bool,
-        hardMode: bool
+        hardMode: bool,
+        numPlayers: int
     ) -> None:
         self._addInvestigation(symbol, raisedHand)
 
@@ -78,6 +79,7 @@ class Player():
             self.setMax(symbol, 0 if not hardMode else 1)
 
         if hardMode:
+            numCards = int(12 / numPlayers)
             # investigations are unique
             investigations = [
                 i['raisedHand']
@@ -87,11 +89,15 @@ class Player():
             numInvestigations = len(investigations)
 
             # Special logic cases
-            if numInvestigations >= 2:
-                if numRaised == 0:
-                    self.setMax(symbol, 0)
-                elif numRaised >= 2:
-                    self.setMin(symbol, 2)
+            if numInvestigations > 1 and numRaised == 0:
+                # "seen" every card, never raised hands
+                self.setMax(symbol, 0)
+
+            if numInvestigations == numCards and numRaised == numInvestigations:
+                # "not seen" all cards, never dropped hand
+                self.setMin(symbol, 2)
+
+
 
     def _getInterrogations(
         self,
