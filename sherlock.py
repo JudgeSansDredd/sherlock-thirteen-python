@@ -23,19 +23,20 @@ def getGameMode(whiptail: Whiptail) -> tuple[bool, list[Player], int, bool]:
     if resCode == 1 and confirmQuit(whiptail):
         return False, [], 0, False
     numPlayers = int(strNumPlayers)
+    numCards = int(12 / numPlayers)
 
     # Get user's name
     yourName, resCode = whiptail.inputbox("What is your name?", "")
     if resCode == 1 and confirmQuit(whiptail):
         return False, [], 0, False
-    players = [Player(yourName, True)]
+    players = [Player(yourName, numCards, True)]
 
     # Get other players
     for i in range(numPlayers - 1):
         name, resCode = whiptail.inputbox(f"What is player {i + 2}'s name?", "")
         if resCode == 1 and confirmQuit(whiptail):
             return False, [], 0, False
-        players.append(Player(name))
+        players.append(Player(name, numCards))
 
     # Get starting player
     strPlayerNumber, resCode = whiptail.menu(

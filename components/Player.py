@@ -2,20 +2,21 @@ from bsdtypes.types import Interrogation, Investigation, NumberTracking
 
 
 class Player():
-    def __init__(self, name, isUserPlayer=False):
+    def __init__(self, name, numCards, isUserPlayer=False):
         self.name = name
         self.hiddenCard = 0
         self.investigations = []
         self.interrogations = []
+        self.numCards = numCards
         self.symbols = {
-            "p": {'min': 0, 'max': 3},
-            "l": {'min': 0, 'max': 3},
-            "f": {'min': 0, 'max': 3},
-            "b": {'min': 0, 'max': 3},
-            "j": {'min': 0, 'max': 3},
-            "n": {'min': 0, 'max': 3},
-            "e": {'min': 0, 'max': 3},
-            "s": {'min': 0, 'max': 3}
+            "p": {'min': 0, 'max': self.numCards},
+            "l": {'min': 0, 'max': self.numCards},
+            "f": {'min': 0, 'max': self.numCards},
+            "b": {'min': 0, 'max': self.numCards},
+            "j": {'min': 0, 'max': self.numCards},
+            "n": {'min': 0, 'max': self.numCards},
+            "e": {'min': 0, 'max': self.numCards},
+            "s": {'min': 0, 'max': self.numCards}
         }
         self.inGame = True
         self.won = False
@@ -69,7 +70,6 @@ class Player():
         symbol: str,
         raisedHand: bool,
         hardMode: bool,
-        numPlayers: int
     ) -> None:
         self._addInvestigation(symbol, raisedHand)
 
@@ -79,7 +79,6 @@ class Player():
             self.setMax(symbol, 0 if not hardMode else 1)
 
         if hardMode:
-            numCards = int(12 / numPlayers)
             # investigations are unique
             investigations = [
                 i['raisedHand']
@@ -93,7 +92,7 @@ class Player():
                 # "seen" every card, never raised hands
                 self.setMax(symbol, 0)
 
-            if numInvestigations == numCards and numRaised == numInvestigations:
+            if numInvestigations == self.numCards and numRaised == numInvestigations:
                 # "not seen" all cards, never dropped hand
                 self.setMin(symbol, 2)
 
@@ -143,7 +142,8 @@ class Player():
             allNumsMatch = len(deDupedInterrogations) == len(interrogations)
             if len(interrogations) > 1 and allNumsMatch:
                 if number == 0:
+                    # "seen" all cards, never had more than 0
                     self.setMax(symbol, 0)
-                elif number == 2:
-                    self.setMin(symbol, 3)
+                elif number == self.numCards - 1:
+                    self.setMin(symbol, self.numCards)
 
